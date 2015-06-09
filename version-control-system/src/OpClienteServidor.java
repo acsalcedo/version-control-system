@@ -1,14 +1,23 @@
 /*
-Interfase para las operaciones remotas entre el cliente y el servidor
+Interfase para las operaciones remotas entre el Cliente y el servPrincipal
 Modo unicast
 */
-
+import java.util.HashMap;
 public interface OpClienteServidor extends java.rmi.Remote {
 
-    public commit() throws java.rmi.RemoteException;
+    /*
+       Metodo commit
+       Envia una Coleccion para almacenarla provisionalmente en temp.
+       Por otra parte, crea una directorio y escribe los archivos enviados
+       en èl.
+    */
+    public boolean commit(Coleccion archivos_enviar)
+        throws java.rmi.RemoteException;
 
-    public update() throws java.rmi.RemoteException;
+    public void update() throws java.rmi.RemoteException;
 
-    public checkout() throws java.rmi.RemoteException;
+    public void checkout() throws java.rmi.RemoteException;
+
+    public void listarArchivos() throws java.rmi.RemoteException;
 
 }

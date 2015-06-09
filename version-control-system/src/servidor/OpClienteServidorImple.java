@@ -51,7 +51,7 @@ public class OpClienteServidorImple
                     System.out.println(nomDirectorio+'/'+doc.obtNombre());
                     File nuevo = new File(nomDirectorio+'/'+doc.obtNombre());
 
-                    //directorio.renameTo(nuevo);
+                    directorio.renameTo(nuevo);
                     BufferedOutputStream salida = new
                       BufferedOutputStream( new FileOutputStream(nuevo));
 
