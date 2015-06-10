@@ -1,8 +1,4 @@
-/*
-Implementación de la interfase OpClienteServidor.
-Se implementan las operaciones remotas tanto de ServPrincipal como
-ServAlmacenamiento.
-*/
+
 import java.util.*;
 import java.io.*;
 
@@ -90,4 +86,5 @@ public class OpClienteServidorImple
     }
 
 
-}
+}   
+
