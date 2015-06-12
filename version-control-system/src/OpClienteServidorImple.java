@@ -1,6 +1,9 @@
 
 import java.util.*;
 import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 
 public class OpClienteServidorImple
     extends
@@ -20,7 +23,7 @@ public class OpClienteServidorImple
        Por otra parte, crea una directorio y escribe los archivos enviados
        en èl.
     */
-    public boolean commit(Coleccion archivos_enviar )
+    public boolean commit(Coleccion archivos_enviar)
         throws java.rmi.RemoteException {
 
         Collection<Documento> archivos = archivos_enviar.obtDocumentos();
@@ -68,10 +71,32 @@ public class OpClienteServidorImple
 
     public void update() throws java.rmi.RemoteException {
 
+        
     }
 
-    public void checkout()  throws java.rmi.RemoteException {
+    public Coleccion checkout(String nombreRepo)  throws java.rmi.RemoteException {
 
+        Path path = Paths.get(nombreRepo);
+       
+        if (!Files.exists(path)) {
+            System.out.println("El repositorio " + nombreRepo + " no existe.");
+            return null;
+        } else {
+            
+            Coleccion docs = new Coleccion(nombreRepo);
+            File carpeta = new File(nombreRepo);
+            File[] archivos = carpeta.listFiles();
+            
+            for (int i = 0; i < archivos.length; i++) {
+                if (archivos[i].isFile()) {
+                    String nombreArchivo = archivos[i].getName();
+                    System.out.println(nombreArchivo);
+                    docs.agregarDocumento(path.toString()+'/'+nombreArchivo);
+                }
+            } 
+            return docs;
+        }  
+            
     }
 
     public void listarArchivos() throws java.rmi.RemoteException {

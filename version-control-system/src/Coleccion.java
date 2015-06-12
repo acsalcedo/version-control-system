@@ -28,19 +28,18 @@ public class Coleccion implements Serializable {
             // Falta implementar la semantica de archivos inmutables
             almacen.put(doc.obtNombre(),doc);
             return true;
-        }
-        else
+        } else
             return false;
 
     }
 
     public boolean agregarDocumento(Documento doc) {
-         if (doc != null){
+        
+        if (doc != null){
             // Falta implementar la semantica de archivos inmutables
             almacen.put(doc.obtNombre(),doc);
             return true;
-        }
-        else
+        } else
             return false;
     }
 

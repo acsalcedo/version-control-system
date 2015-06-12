@@ -34,8 +34,13 @@ public class ServPrincipal extends ServAlmacenamiento {
         }
     }
 
-  public static void main(String args[])
-   {
+public static void main(String args[]) {
+      
+    if (args.length < 1) {
+        System.err.println("Parametros incorrectos. java ServPrincipal <puerto>");
+        System.exit(1);
+    }
+       
     int puerto = Integer.parseInt(args[0]);
       try {
             LocateRegistry.createRegistry(puerto);

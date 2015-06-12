@@ -38,6 +38,38 @@ public class Cliente {
     public Coleccion obtArchivosProtegidos() {
         return archivosProtegidos;
     }
+    
+    public static void crearRepositorio(Coleccion documentos) {
+
+        if (!documentos.coleccionVacia()) {
+
+            Collection<Documento> archivos = documentos.obtDocumentos();
+            String nomDirectorio = "clientes/" +documentos.obtNombreProyecto();
+            
+            File directorio = new File(nomDirectorio);
+            
+            if (directorio.exists())
+                System.out.println("Ya existe el repositorio.");
+            else {                
+                if (directorio.mkdirs())
+                    System.out.println("Se creo la carpeta del repositorio.");
+            }            
+            try {
+                for (Documento doc: archivos) {
+                    
+                    FileOutputStream salida = new FileOutputStream(nomDirectorio + '/'+doc.obtNombre());
+                    salida.write(doc.obtContenidoByte());
+                    salida.close();
+                    
+                    System.out.println("Se creo el archivo: " + doc.obtNombre());
+                }
+            } catch (Exception e) {
+                System.out.println("Cliente: " + e.getMessage());
+            }
+        } else 
+            System.out.println("El repositorio esta vacio.");
+        
+    }
 
     public static void main(String[] args) {
         String host = null;
@@ -55,18 +87,24 @@ public class Cliente {
             Cliente cli = new Cliente(args[0],Integer.parseInt(args[1]));
 
             // Busca al objeto que ofrece el servicio con nombre
-            // CalculatorService en el Registry que se encuentra en
+            // Coleccion en el Registry que se encuentra en
             // el ndServidor <ndServidor> y puerto <port>
 
             OpClienteServidor operaciones = (OpClienteServidor)
             Naming.lookup("rmi://" +host+ ":" +puerto+ "/ServicioSCVD");
 
             String workingDirectory = System.getProperty("user.dir");
+            String repository = "pruebas";
+            
             // Hacer commit
-            cli.agregarDirectorioProtegido("pruebassss");
-            cli.agregarArchivo(workingDirectory +"/../pruebas/archivo1.txt");
-            cli.agregarArchivo(workingDirectory +"/../pruebas/archivo2.txt");
+            cli.agregarDirectorioProtegido("test");
+            cli.agregarArchivo(workingDirectory +"/pruebas/archivo1.txt");
+            cli.agregarArchivo(workingDirectory +"/pruebas/archivo2.txt");
             operaciones.commit(cli.obtArchivosProtegidos());
+            
+            Coleccion docs = operaciones.checkout(repository);
+            
+            crearRepositorio(docs);
 
         } catch (Exception e) {
             System.out.println("Cliente Exception: "+e.getMessage());
