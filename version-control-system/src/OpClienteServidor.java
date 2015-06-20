@@ -2,7 +2,6 @@
 Interfase para las operaciones remotas entre el Cliente y el servPrincipal
 Modo unicast
 */
-import java.util.HashMap;
 public interface OpClienteServidor extends java.rmi.Remote {
 
     /*
