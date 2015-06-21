@@ -5,6 +5,8 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.net.UnknownHostException;
 import java.util.*;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 
 public class OpServidorServidor {
@@ -65,7 +67,7 @@ public class OpServidorServidor {
         return false;
     }
     
-    public InetAddress buscarHost(String nombreRepo) {
+    public String buscarHost(String nombreRepo) {
         
         String repo = "repositorios/" + nombreRepo;
         try {
@@ -89,17 +91,28 @@ public class OpServidorServidor {
             byte[] buf = new byte[1000];
             DatagramPacket recv = new DatagramPacket(buf, buf.length,direccionIpMulticast,puerto);
             System.out.println("Esperando...");
-            //socket.receive(recv);
+            socket.receive(recv);
             socket.receive(recv);
             
             System.out.println("Recibi host: ");
             
             System.out.println(recv.getAddress());
             
-            return recv.getAddress();
+            ByteArrayInputStream bs2= new ByteArrayInputStream(buf); // bytes es el byte[]
+            ObjectInputStream is = new ObjectInputStream(bs2);
+            Object o = is.readObject();
+            System.out.println(o.getClass().toString());
+            if (o.getClass() == Coleccion.class) {
+                System.out.println(recv.getAddress());
+                return recv.getAddress() + "," + puerto;
+            } else {
+                return null;
+            }
             
         } catch (IOException ex) {
             ex.printStackTrace();
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(OpServidorServidor.class.getName()).log(Level.SEVERE, null, ex);
         }
 
         return null;

@@ -79,7 +79,7 @@ public class OpClienteServidorImple
 
     }
 
-    public InetAddress checkout(String nombreRepo) throws java.rmi.RemoteException {
+    public String checkout(String nombreRepo) throws java.rmi.RemoteException {
 
         
         return operacionesInternas.buscarHost(nombreRepo);
