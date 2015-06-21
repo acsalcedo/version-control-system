@@ -1,3 +1,6 @@
+
+import java.net.InetAddress;
+
 /*
 Interfase para las operaciones remotas entre el Cliente y el servPrincipal
 Modo unicast
@@ -15,7 +18,7 @@ public interface OpClienteServidor extends java.rmi.Remote {
 
     public void update() throws java.rmi.RemoteException;
 
-    public Coleccion checkout(String nombreRepo) throws java.rmi.RemoteException;
+    public InetAddress checkout(String nombreRepo) throws java.rmi.RemoteException;
 
     public void listarArchivos() throws java.rmi.RemoteException;
 

@@ -9,10 +9,12 @@ JC = javac
 all:
 	make class
 	rmic OpClienteServidorImple
-	mkdir -p cliente servidor servidor/repositorios
+	mkdir -p cliente servidor servidor/repositorios servidorAlm servidorAlm/repositorios
 	cp $(CLIENTE) cliente
 	cp $(SERVIDOR) servidor
-	cp -a pruebas/* servidor/repositorios
+	cp $(SERVIDOR) servidorAlm 
+	cp -a pruebas/* servidorAlm/repositorios
+	cp -a pruebas/* cliente/
 	rm *.class
 
 
@@ -20,7 +22,8 @@ CLIENTE = \
 		Cliente.class \
 		Coleccion.class \
 		Documento.class \
-		OpClienteServidorImple_Stub.class
+		OpClienteServidorImple_Stub.class \
+		OpClienteServidor.class
 
 SERVIDOR = \
 		Coleccion.class \
@@ -29,7 +32,8 @@ SERVIDOR = \
 		OpClienteServidorImple.class \
 		OpClienteServidorImple_Stub.class \
 		ServAlmacenamiento.class \
-		ServPrincipal.class
+		ServPrincipal.class \
+		OpServidorServidor.class
 
 CLASSES = \
 		Cliente.java \
@@ -38,12 +42,13 @@ CLASSES = \
 		OpClienteServidorImple.java \
 		OpClienteServidor.java \
 		ServAlmacenamiento.java \
-		ServPrincipal.java
+		ServPrincipal.java \
+		OpServidorServidor.java
 
 class: classes
 
 classes: $(CLASSES:.java=.class)
 
 clean:
-	$(RM) -f *.class cliente/*.class servidor/*.class
-	$(RM) -r cliente servidor
+	$(RM) -f *.class 
+	$(RM) -r cliente servidor servidorAlm

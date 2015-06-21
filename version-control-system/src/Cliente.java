@@ -94,17 +94,17 @@ public class Cliente {
             Naming.lookup("rmi://" +host+ ":" +puerto+ "/ServicioSCVD");
 
             String workingDirectory = System.getProperty("user.dir");
-            String repository = "pruebas";
+            String repository = "prueba1";
 
             // Hacer commit
-            cli.agregarDirectorioProtegido("test");
-            cli.agregarArchivo(workingDirectory +"/pruebas/archivo1.txt");
-            cli.agregarArchivo(workingDirectory +"/pruebas/archivo2.txt");
+            cli.agregarDirectorioProtegido("prueba1");
+            cli.agregarArchivo(workingDirectory +"/prueba1/archivo1.txt");
+            cli.agregarArchivo(workingDirectory +"/prueba1/archivo2.txt");
             operaciones.commit(cli.obtArchivosProtegidos());
 
-            Coleccion docs = operaciones.checkout(repository);
+            System.out.println(operaciones.checkout(repository));
 
-            crearRepositorio(docs);
+            //crearRepositorio(docs);
 
         } catch (Exception e) {
             System.out.println("Cliente Exception: "+e.getMessage());

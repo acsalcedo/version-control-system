@@ -20,7 +20,7 @@ public class OpServidorServidor {
             this.puerto = puerto;
             this.direccionIpMulticast = InetAddress.getByName(direccionIpMulticast);
             socket = new MulticastSocket(puerto);
-            //socket.joinGroup(this.direccionIpMulticast);
+            socket.joinGroup(this.direccionIpMulticast);
         } catch (Exception e) {
             System.out.println("OpServidorServidor :"+ e.getMessage());
             e.printStackTrace();
@@ -35,16 +35,13 @@ public class OpServidorServidor {
     */
     public boolean replicarGrupal(Coleccion archivos_enviar) {
 
-        ArrayList<Documento> archivos = new ArrayList<Documento>(
-                                archivos_enviar.obtDocumentos());
-        String nomDirectorio = archivos_enviar.obtNombreProyecto();
         byte[] archivosTransformados;
         DatagramPacket mensaje, longitud_a_enviar;
 
         try {
             ByteArrayOutputStream bs = new ByteArrayOutputStream();
             ObjectOutputStream os = new ObjectOutputStream (bs);
-            os.writeObject(archivos);  // this es de tipo DatoUdp
+            os.writeObject(archivos_enviar);  // this es de tipo DatoUdp
             os.close();
             archivosTransformados =  bs.toByteArray(); // devuelve byte[]
 
@@ -67,5 +64,47 @@ public class OpServidorServidor {
 
         return false;
     }
+    
+    public InetAddress buscarHost(String nombreRepo) {
+        
+        String repo = "repositorios/" + nombreRepo;
+        try {
+            
+            ByteArrayOutputStream bs = new ByteArrayOutputStream();
+            ObjectOutputStream os = new ObjectOutputStream (bs);
+            os.writeObject(repo);  // this es de tipo DatoUdp
+            os.close();
+            byte[] str =  bs.toByteArray(); // devuelve byte[]
+
+            // Receive the information and print it.
+            int num =  str.length;
+            byte[] longitud = Integer.toString(num).getBytes();
+            DatagramPacket longitud_a_enviar = new DatagramPacket(longitud, longitud.length,
+                                        direccionIpMulticast, puerto);
+            DatagramPacket msj = new DatagramPacket(str,str.length,
+                                                    direccionIpMulticast, puerto);
+            socket.send(longitud_a_enviar);
+            socket.send(msj);
+            
+            byte[] buf = new byte[1000];
+            DatagramPacket recv = new DatagramPacket(buf, buf.length,direccionIpMulticast,puerto);
+            System.out.println("Esperando...");
+            //socket.receive(recv);
+            socket.receive(recv);
+            
+            System.out.println("Recibi host: ");
+            
+            System.out.println(recv.getAddress());
+            
+            return recv.getAddress();
+            
+        } catch (IOException ex) {
+            ex.printStackTrace();
+        }
+
+        return null;
+        
+    }
+    
 
 }
