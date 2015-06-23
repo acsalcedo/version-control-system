@@ -12,11 +12,13 @@ public class OpClienteServidorImple
 
     private Coleccion temp; // copia de coleccion enviada por commit
     private OpServidorServidor operacionesInternas;
+    private int nroReplicas;
 
-    public OpClienteServidorImple() throws java.rmi.RemoteException {
+    public OpClienteServidorImple(OpServidorServidor operacionesInternas)
+            throws java.rmi.RemoteException {
         super();
         temp = new Coleccion();
-        operacionesInternas = new OpServidorServidor(8500,"224.0.0.3");
+        this.operacionesInternas = operacionesInternas;
     }
 
     /*
@@ -43,8 +45,9 @@ public class OpClienteServidorImple
                                        +nomDirectorio);
                 }
             }
-
+            //System.out.println("Que pasa");
             operacionesInternas.replicarGrupal(archivos_enviar);
+            //System.out.println("Que paso algo?");
            try {
                 // Agrega los archivos contenidos en la coleccion
                 // Escribe los documentos en el sistema de archivos del servidor
@@ -108,12 +111,11 @@ public class OpClienteServidorImple
     }
 
     /*
-        Devuelve una copia de la ultima coleccion enviada
+        Devuelve una copia de la ultima coleccion procesada
     */
     public Coleccion obtColeccion(){
         return temp;
     }
-
 
 }
 

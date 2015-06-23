@@ -10,8 +10,8 @@ import java.io.*;
 public class Coleccion implements Serializable {
 
     // Posiblemente haya que hacerlo concurrente
-    HashMap<String,Documento> almacen;
-    String nombreProyecto;
+    private HashMap<String,Documento> almacen;
+    private String nombreProyecto;
     // Una fecha. Usar un java.util.Date
 
     public Coleccion(){
@@ -34,7 +34,7 @@ public class Coleccion implements Serializable {
     }
 
     public boolean agregarDocumento(Documento doc) {
-        
+
         if (doc != null){
             // Falta implementar la semantica de archivos inmutables
             almacen.put(doc.obtNombre(),doc);

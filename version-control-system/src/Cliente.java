@@ -97,14 +97,16 @@ public class Cliente {
             String repository = "pruebas";
 
             // Hacer commit
-            cli.agregarDirectorioProtegido("test");
+            
+            cli.agregarDirectorioProtegido("mitest");
             cli.agregarArchivo(workingDirectory +"/pruebas/archivo1.txt");
             cli.agregarArchivo(workingDirectory +"/pruebas/archivo2.txt");
+            System.out.println("mi directorio: " +workingDirectory);
             operaciones.commit(cli.obtArchivosProtegidos());
 
-            Coleccion docs = operaciones.checkout(repository);
+            //Coleccion docs = operaciones.checkout(repository);
 
-            crearRepositorio(docs);
+            //crearRepositorio(docs);
 
         } catch (Exception e) {
             System.out.println("Cliente Exception: "+e.getMessage());
