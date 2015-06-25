@@ -73,17 +73,11 @@ public class ServAlmacenamiento {
     }
 
     static boolean notificarServicio() {
-        String orden = "AGREGAR";
+        String orden = "AGREGAR " + nombreServidor;
         DatagramPacket reporte;
         try {
             reporte = new DatagramPacket(orden.getBytes(), orden.length(),
                                 direccionIPMulticast, puerto);
-            socketEscucha.send(reporte);
-            reporte =
-                new DatagramPacket(nombreServidor.getBytes(),
-                                   nombreServidor.getBytes().length,
-                                    direccionIPMulticast,
-                                    puerto);
             socketEscucha.send(reporte);
         } catch(Exception e) {
             System.out.println("ServAlmacenamiento :"+e.getMessage());
@@ -107,6 +101,7 @@ public class ServAlmacenamiento {
         byte[] buzonEstandar = new byte[256], paquete;
         byte[] copiaBuzon = new byte[256];
         String mensaje, nombreProyecto, temporal;
+        String[] ordenDestinario;
 
         DatagramPacket paqueteEntrante = new
             DatagramPacket(buzonEstandar,buzonEstandar.length);
@@ -124,39 +119,44 @@ public class ServAlmacenamiento {
             notificarServicio();
 
             while (true) {
-                // Recibe un primer paquete del tamaño completo de todos los
-                // documentos.
-                socketEscucha.receive(paqueteEntrante);
+              // Recibe un primer paquete del tamaño completo de todos los
+              // documentos.
+              socketEscucha.receive(paqueteEntrante);
+              mensaje = new String(buzonEstandar, 0,
+                                       buzonEstandar.length);
+              mensaje = mensaje.trim();
+              System.out.println("Debug: " + mensaje );
+              ordenDestinario = mensaje.split(" ");
+
+              if ( ordenDestinario[1].equals(nombreServidor)){
                 System.out.println("Nuevo mensaje");
-                mensaje = new String(buzonEstandar, 0,
-                                         buzonEstandar.length);
-                mensaje = mensaje.trim();
-                System.out.println("Tipo de orden: " + mensaje);
-                switch (mensaje) {
-                    case "REPLICA":
+                System.out.println("Tipo de orden: " + ordenDestinario[0]);
+                switch (ordenDestinario[0]) {
+                  case "REPLICA":
                     // Recibe el nombre del proyecto
                         buzonEstandar = new byte[256]; // Resetear buffer entrada
-                        paqueteEntrante = 
+                        paqueteEntrante =
                             new DatagramPacket(buzonEstandar, buzonEstandar.length);
                         socketEscucha.receive(paqueteEntrante);
                         mensaje = new String(buzonEstandar, 0,
                                          buzonEstandar.length);
                         mensaje = mensaje.trim();
+
                         System.out.println("Nombre proyecto: " + mensaje);
                         nombreProyecto = mensaje;
 
 
                         // Recibe un primer paquete del tamaño completo de
                         // todos los documentos.
-                        buzonEstandar = new byte[256]; // Resetear buffer entrada                        
-                        paqueteEntrante = 
+                        buzonEstandar = new byte[256]; // Resetear buffer entrada
+                        paqueteEntrante =
                             new DatagramPacket(buzonEstandar, buzonEstandar.length);
                         socketEscucha.receive(paqueteEntrante);
                         mensaje = new String(buzonEstandar, 0,
                                          buzonEstandar.length);
                         mensaje = mensaje.trim();
                         System.out.println("Longitud de paquete de documentos: "
-                                            + mensaje);
+                                            + mensaje + " bytes");
                         paquete = new byte[Integer.parseInt(mensaje)];
                         paqueteEntrante =
                             new DatagramPacket(paquete, paquete.length);
@@ -173,21 +173,17 @@ public class ServAlmacenamiento {
                         // Hacer la replica
                         construirReplica(archivos, nombreProyecto);
                         //Luego enviar acuse de recibo
-                        break;
-                    case "AGREGAR":
-                        DatagramPacket nuevoServidor = new
-                            DatagramPacket(copiaBuzon,copiaBuzon.length);
-                        socketEscucha.receive(nuevoServidor);
-                        temporal = new String(copiaBuzon, 0,
-                                         copiaBuzon.length);
-                        temporal = temporal.trim();
-                        System.out.println("Nuevo servidor detectado: "
-                                            + temporal);
-                        agregarOtrosServEnServicio(temporal);
-                        //Luego enviar acuse de recibo
-                        break;
+                    break;
+                  case "AGREGAR":
+                      System.out.println("Nuevo servidor detectado: "
+                                          + ordenDestinario[1]);
+                      agregarOtrosServEnServicio(ordenDestinario[1]);
+                      //Luego enviar acuse de recibo
+                      break;
                 }
+              }
             }
+
         } catch(Exception e) {
            System.out.println("ServAlmacenamiento :"+e.getMessage());
                 e.printStackTrace();
