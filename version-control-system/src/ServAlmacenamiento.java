@@ -21,7 +21,7 @@ public class ServAlmacenamiento {
     static int puerto;
 
     public static boolean construirReplica(
-            ArrayList<Documento> archivos_recibidos, String nomDirectorio) {
+        ArrayList<Documento> archivos_recibidos, String nomDirectorio) {
         //String nomDirectorio = "pruebasAlmacenamiento";
         byte[] buffer;
 
@@ -103,6 +103,8 @@ public class ServAlmacenamiento {
         String mensaje, nombreProyecto, temporal;
         String[] ordenDestinario;
 
+
+
         DatagramPacket paqueteEntrante = new
             DatagramPacket(buzonEstandar,buzonEstandar.length);
 
@@ -114,9 +116,18 @@ public class ServAlmacenamiento {
 
             socketEscucha = new MulticastSocket(puerto);
             socketEscucha.joinGroup(direccionIPMulticast);
-
-            // Reportar servidor en servicio. FALTA PROBARLO.
             notificarServicio();
+
+            /*TimerTask timerTask = new TimerTask()
+            {
+                public void run() {
+                    notificarServicio();
+                }
+            };
+
+            Timer timer = new Timer();
+            // Notificar servicio cada minuto
+            timer.scheduleAtFixedRate(timerTask, 0, 3600000);*/
 
             while (true) {
               // Recibe un primer paquete del tamaño completo de todos los
@@ -125,14 +136,13 @@ public class ServAlmacenamiento {
               mensaje = new String(buzonEstandar, 0,
                                        buzonEstandar.length);
               mensaje = mensaje.trim();
-              System.out.println("Debug: " + mensaje );
+              //System.out.println("Debug: " + mensaje );
               ordenDestinario = mensaje.split(" ");
-
-              if ( ordenDestinario[1].equals(nombreServidor)){
-                System.out.println("Nuevo mensaje");
-                System.out.println("Tipo de orden: " + ordenDestinario[0]);
                 switch (ordenDestinario[0]) {
                   case "REPLICA":
+                    if ( ordenDestinario[1].equals(nombreServidor)){
+                        System.out.println("Nuevo mensaje");
+                        System.out.println("Tipo de orden: " + ordenDestinario[0]);
                     // Recibe el nombre del proyecto
                         buzonEstandar = new byte[256]; // Resetear buffer entrada
                         paqueteEntrante =
@@ -173,15 +183,17 @@ public class ServAlmacenamiento {
                         // Hacer la replica
                         construirReplica(archivos, nombreProyecto);
                         //Luego enviar acuse de recibo
+                    }
                     break;
                   case "AGREGAR":
+                    System.out.println("Nuevo mensaje");
+                    System.out.println("Tipo de orden: " + ordenDestinario[0]);
                       System.out.println("Nuevo servidor detectado: "
                                           + ordenDestinario[1]);
                       agregarOtrosServEnServicio(ordenDestinario[1]);
                       //Luego enviar acuse de recibo
                       break;
                 }
-              }
             }
 
         } catch(Exception e) {

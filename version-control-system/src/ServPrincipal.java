@@ -4,8 +4,6 @@ Clase de Servidor principal
 */
 import java.io.*;
 import java.rmi.*;
-
-
 import java.util.*;
 import java.rmi.registry.*;
 import java.lang.*;
@@ -27,11 +25,11 @@ public class ServPrincipal extends ServAlmacenamiento {
                          int nroReplicas,
                          String direccionMulticast,
                          OpServidorServidor operacionesInternas) {
-        this.puerto = puertoServicio;
+                           
+            this.puerto = puertoServicio;
         try {
             OpClienteServidor operaciones =
                 new OpClienteServidorImple(operacionesInternas);
-            //Probar notificar servicio. Despues se borra
             Naming.rebind("rmi://localhost:"+puertoServicio+"/ServicioSCVD",
                          operaciones);
         } catch(Exception e) {
@@ -40,31 +38,31 @@ public class ServPrincipal extends ServAlmacenamiento {
         }
     }
 
-public static void main(String args[]) {
+    public static void main(String args[]) {
 
-    if (args.length < 3) {
-        System.err.println("Parametros incorrectos. java ServPrincipal"
-            + "<puertoServicio> <puertoControl> <direccionMulticast> <NroReplicas>");
-        System.exit(1);
-    }
+        if (args.length < 3) {
+            System.err.println("Parametros incorrectos. java ServPrincipal"
+                + "<puertoServicio> <puertoControl> <direccionMulticast> <NroReplicas>");
+            System.exit(1);
+        }
 
-    int puertoServicio = Integer.parseInt(args[0]);
-    int puertoControl = Integer.parseInt(args[1]);
-    int nroReplicas = Integer.parseInt(args[3]);
+        int puertoServicio = Integer.parseInt(args[0]);
+        int puertoControl = Integer.parseInt(args[1]);
+        int nroReplicas = Integer.parseInt(args[3]);
 
-    try {
-        LocateRegistry.createRegistry(puertoServicio);
-    } catch(Exception e) {
-       System.out.println("ServPrincipal :"+e.getMessage());
-            e.printStackTrace();
-    }
+        try {
+            LocateRegistry.createRegistry(puertoServicio);
+        } catch(Exception e) {
+           System.out.println("ServPrincipal :"+e.getMessage());
+                e.printStackTrace();
+        }
 
-    OpServidorServidor operacionesInternas =
-        new OpServidorServidor(puertoControl, args[2], nroReplicas);
+        OpServidorServidor operacionesInternas =
+            new OpServidorServidor(puertoControl, args[2], nroReplicas);
 
-    operacionesInternas.start();
-    new ServPrincipal(puertoServicio, puertoControl,
-                      nroReplicas, args[2], operacionesInternas);
-   }
+        operacionesInternas.start();
+        new ServPrincipal(puertoServicio, puertoControl,
+                          nroReplicas, args[2], operacionesInternas);
+       }
 
 }

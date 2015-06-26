@@ -55,7 +55,7 @@ public class Cliente {
                     System.out.println("Se creo la carpeta del repositorio.");
             }
             try {
-                for (Documento doc: archivos) {
+                for (Documento doc : archivos) {
 
                     FileOutputStream salida = new FileOutputStream(nomDirectorio + '/'+doc.obtNombre());
                     salida.write(doc.obtContenidoByte());
@@ -94,27 +94,26 @@ public class Cliente {
             Naming.lookup("rmi://" +host+ ":" +puerto+ "/ServicioSCVD");
 
             String workingDirectory = System.getProperty("user.dir");
-            String repository = "pruebas";
+            String repository = "repositorios";
 
             // Hacer commit
-            
             cli.agregarDirectorioProtegido("mitest");
             cli.agregarArchivo(workingDirectory +"/pruebas/archivo1.txt");
             cli.agregarArchivo(workingDirectory +"/pruebas/archivo2.txt");
-            System.out.println("mi directorio: " +workingDirectory);
+            //System.out.println("mi directorio: " +workingDirectory);
             operaciones.commit(cli.obtArchivosProtegidos());
+            System.out.println(operaciones.listarArchivos("mitest"));
+            System.out.println(operaciones.listarArchivos(repository));
 
-            //Coleccion docs = operaciones.checkout(repository);
+            Coleccion docs = operaciones.checkout(repository);
 
-            //crearRepositorio(docs);
+
+            crearRepositorio(docs);
 
         } catch (Exception e) {
             System.out.println("Cliente Exception: "+e.getMessage());
         }
 
     }
-
-
-
 
 }

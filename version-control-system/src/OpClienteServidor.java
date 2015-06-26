@@ -17,6 +17,6 @@ public interface OpClienteServidor extends java.rmi.Remote {
 
     public Coleccion checkout(String nombreRepo) throws java.rmi.RemoteException;
 
-    public void listarArchivos() throws java.rmi.RemoteException;
+    public String listarArchivos(String nombreRepo) throws java.rmi.RemoteException;
 
 }

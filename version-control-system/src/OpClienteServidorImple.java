@@ -89,7 +89,7 @@ public class OpClienteServidorImple
             System.out.println("El repositorio " + nombreRepo + " no existe.");
             return null;
         } else {
-
+            System.out.println("Checkout al: " +nombreRepo);
             Coleccion docs = new Coleccion(nombreRepo);
             File carpeta = new File(nombreRepo);
             File[] archivos = carpeta.listFiles();
@@ -106,8 +106,27 @@ public class OpClienteServidorImple
 
     }
 
-    public void listarArchivos() throws java.rmi.RemoteException {
 
+    public String listarArchivos(String nombreRepo) throws java.rmi.RemoteException {
+        Path path = Paths.get(nombreRepo);
+        String listaArch = "";
+
+        if (!Files.exists(path)) {
+            System.out.println("El repositorio " + nombreRepo + " no existe.");
+            return null;
+        } else {
+            File carpeta = new File(nombreRepo);
+            File[] archivos = carpeta.listFiles();
+            listaArch = "Nombre de repositorio: " + nombreRepo;
+
+            for (int i = 0; i < archivos.length; i++) {
+                if (archivos[i].isFile()) {
+                    listaArch += "\n" + archivos[i].getName();
+                }
+            }
+            listaArch += "\n";  
+            return listaArch;
+        }
     }
 
     /*
