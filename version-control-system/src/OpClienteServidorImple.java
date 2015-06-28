@@ -13,11 +13,13 @@ public class OpClienteServidorImple
 
     private Coleccion temp; // copia de coleccion enviada por commit
     private OpServidorServidor operacionesInternas;
+    private int nroReplicas;
 
-    public OpClienteServidorImple() throws java.rmi.RemoteException {
+    public OpClienteServidorImple(OpServidorServidor operacionesInternas)
+            throws java.rmi.RemoteException {
         super();
         temp = new Coleccion();
-        operacionesInternas = new OpServidorServidor(8500,"224.0.0.3");
+        this.operacionesInternas = operacionesInternas;
     }
 
     /*
@@ -44,8 +46,9 @@ public class OpClienteServidorImple
                                        +nomDirectorio);
                 }
             }
-
+            //System.out.println("Que pasa");
             operacionesInternas.replicarGrupal(archivos_enviar);
+            //System.out.println("Que paso algo?");
            try {
                 // Agrega los archivos contenidos en la coleccion
                 // Escribe los documentos en el sistema de archivos del servidor
@@ -74,11 +77,13 @@ public class OpClienteServidorImple
         return false;
     }
 
-    public void update() throws java.rmi.RemoteException {
+    public Coleccion update(String nombreRepo) throws java.rmi.RemoteException {
 
+        return operacionesInternas.buscarRepo(nombreRepo);
 
     }
 
+<<<<<<< HEAD
     public String checkout(String nombreRepo) throws java.rmi.RemoteException {
 
         
@@ -110,15 +115,42 @@ public class OpClienteServidorImple
 
     public void listarArchivos() throws java.rmi.RemoteException {
 
+=======
+    public Coleccion checkout(String nombreRepo)  throws java.rmi.RemoteException {
+
+        return operacionesInternas.buscarRepo(nombreRepo);
+    }
+
+
+    public String listarArchivos(String nombreRepo) throws java.rmi.RemoteException {
+        Path path = Paths.get(nombreRepo);
+        String listaArch = "";
+
+        if (!Files.exists(path)) {
+            System.out.println("El repositorio " + nombreRepo + " no existe.");
+            return null;
+        } else {
+            File carpeta = new File(nombreRepo);
+            File[] archivos = carpeta.listFiles();
+            listaArch = "Nombre de repositorio: " + nombreRepo;
+
+            for (int i = 0; i < archivos.length; i++) {
+                if (archivos[i].isFile()) {
+                    listaArch += "\n" + archivos[i].getName();
+                }
+            }
+            listaArch += "\n";  
+            return listaArch;
+        }
+>>>>>>> multicast
     }
 
     /*
-        Devuelve una copia de la ultima coleccion enviada
+        Devuelve una copia de la ultima coleccion procesada
     */
     public Coleccion obtColeccion(){
         return temp;
     }
-
 
 }
 

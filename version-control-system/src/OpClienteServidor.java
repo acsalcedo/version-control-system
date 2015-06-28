@@ -1,6 +1,6 @@
 
 /*
-Interfase para las operaciones remotas entre el Cliente y el servPrincipal
+Interfaz para las operaciones remotas entre el Cliente y el servPrincipal
 Modo unicast
 */
 public interface OpClienteServidor extends java.rmi.Remote {
@@ -14,10 +14,10 @@ public interface OpClienteServidor extends java.rmi.Remote {
     public boolean commit(Coleccion archivos_enviar)
         throws java.rmi.RemoteException;
 
-    public void update() throws java.rmi.RemoteException;
+    public Coleccion update(String nombreRepo) throws java.rmi.RemoteException;
 
     public String checkout(String nombreRepo) throws java.rmi.RemoteException;
 
-    public void listarArchivos() throws java.rmi.RemoteException;
+    public String listarArchivos(String nombreRepo) throws java.rmi.RemoteException;
 
 }
