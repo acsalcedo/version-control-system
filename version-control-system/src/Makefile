@@ -9,12 +9,14 @@ JC = javac
 all:
 	make class
 	rmic OpClienteServidorImple
-	mkdir -p cliente servidor servidor/repositorios servidorAlmacenamiento1 servidorAlmacenamiento2
+	mkdir -p cliente servidor servidorAlmacenamiento1 servidorAlmacenamiento2
 	cp $(CLIENTE) cliente
 	cp $(SERVIDOR) servidor
 	cp $(SERVIDORALMACENAMIENTO) servidorAlmacenamiento1
 	cp $(SERVIDORALMACENAMIENTO) servidorAlmacenamiento2
-	cp -a repopruebas/* servidor/repositorios
+	cp -r pruebas/repo1 servidorAlmacenamiento1/
+	cp -r pruebas/repo2 servidorAlmacenamiento2/
+	cp -r pruebas/test cliente/
 	rm *.class
 
 
@@ -54,5 +56,5 @@ class: classes
 classes: $(CLASSES:.java=.class)
 
 clean:
-	$(RM) -f *.class cliente/*.class servidor/*.class
-	$(RM) -r cliente servidor
+	$(RM) -f *.class
+	$(RM) -r cliente servidor servidorAlmacenamiento1 servidorAlmacenamiento2

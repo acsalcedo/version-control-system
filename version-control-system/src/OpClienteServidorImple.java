@@ -76,34 +76,15 @@ public class OpClienteServidorImple
         return false;
     }
 
-    public void update() throws java.rmi.RemoteException {
+    public Coleccion update(String nombreRepo) throws java.rmi.RemoteException {
 
+        return operacionesInternas.buscarRepo(nombreRepo);
 
     }
 
     public Coleccion checkout(String nombreRepo)  throws java.rmi.RemoteException {
 
-        Path path = Paths.get(nombreRepo);
-
-        if (!Files.exists(path)) {
-            System.out.println("El repositorio " + nombreRepo + " no existe.");
-            return null;
-        } else {
-            System.out.println("Checkout al: " +nombreRepo);
-            Coleccion docs = new Coleccion(nombreRepo);
-            File carpeta = new File(nombreRepo);
-            File[] archivos = carpeta.listFiles();
-
-            for (int i = 0; i < archivos.length; i++) {
-                if (archivos[i].isFile()) {
-                    String nombreArchivo = archivos[i].getName();
-                    System.out.println(nombreArchivo);
-                    docs.agregarDocumento(path.toString()+'/'+nombreArchivo);
-                }
-            }
-            return docs;
-        }
-
+        return operacionesInternas.buscarRepo(nombreRepo);
     }
 
 

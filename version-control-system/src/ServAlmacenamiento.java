@@ -8,10 +8,15 @@ import java.net.DatagramPacket;
 import java.net.DatagramSocket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
+import java.net.ServerSocket;
+import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.*;
 
-public class ServAlmacenamiento {
+public class ServAlmacenamiento extends Thread {
 
     // DireccionIp Multicast por defecto "224.0.0.3"
     static InetAddress direccionIPMulticast;
@@ -19,6 +24,7 @@ public class ServAlmacenamiento {
     static HashMap<Integer,String> listaServAlmacen;
     static String nombreServidor;
     static int puerto;
+    static int puertoCliente = 8600;
 
     public static boolean construirReplica(
         ArrayList<Documento> archivos_recibidos, String nomDirectorio) {
@@ -85,6 +91,31 @@ public class ServAlmacenamiento {
         }
         return true;
     }
+    
+    public static Coleccion existeRepo(String nombreRepo) {
+        
+        Path path = Paths.get(nombreRepo);
+
+        if (!Files.exists(path)) {
+            System.out.println("El repositorio " + nombreRepo + " no existe.");
+            return null;
+        } else {
+            System.out.println("Checkout al: " +nombreRepo);
+            Coleccion docs = new Coleccion(nombreRepo);
+            File carpeta = new File(nombreRepo);
+            File[] archivos = carpeta.listFiles();
+
+            for (int i = 0; i < archivos.length; i++) {
+                if (archivos[i].isFile()) {
+                    String nombreArchivo = archivos[i].getName();
+                    System.out.println(nombreArchivo);
+                    docs.agregarDocumento(path.toString()+'/'+nombreArchivo);
+                }
+            }
+            return docs;
+        }
+    }
+  
 
     public static void main(String args[])
         throws UnknownHostException, InterruptedException {
@@ -103,8 +134,28 @@ public class ServAlmacenamiento {
         String mensaje, nombreProyecto, temporal;
         String[] ordenDestinario;
 
-
-
+//        Thread t1 = new Thread(){
+//            
+//            public void run() {
+//        
+//                ServerSocket socketServicio;
+//                Socket socketCliente = null;
+//                DataInputStream is;
+//                PrintStream os;
+//
+//                try {
+//                    socketServicio = new ServerSocket(puertoCliente);
+//
+//                    socketCliente = socketServicio.accept();
+//
+//                    is = new DataInputStream(socketCliente.getInputStream());
+//                    os = new PrintStream(socketCliente.getOutputStream());
+//                } catch (IOException e) {
+//                    System.out.println(e);
+//                }
+//            }
+//        };
+        
         DatagramPacket paqueteEntrante = new
             DatagramPacket(buzonEstandar,buzonEstandar.length);
 
@@ -118,16 +169,6 @@ public class ServAlmacenamiento {
             socketEscucha.joinGroup(direccionIPMulticast);
             notificarServicio();
 
-            /*TimerTask timerTask = new TimerTask()
-            {
-                public void run() {
-                    notificarServicio();
-                }
-            };
-
-            Timer timer = new Timer();
-            // Notificar servicio cada minuto
-            timer.scheduleAtFixedRate(timerTask, 0, 3600000);*/
 
             while (true) {
               // Recibe un primer paquete del tamaño completo de todos los
@@ -185,14 +226,74 @@ public class ServAlmacenamiento {
                         //Luego enviar acuse de recibo
                     }
                     break;
-                  case "AGREGAR":
-                    System.out.println("Nuevo mensaje");
-                    System.out.println("Tipo de orden: " + ordenDestinario[0]);
-                      System.out.println("Nuevo servidor detectado: "
+                    case "AGREGAR":
+                        System.out.println("Nuevo mensaje");
+                        System.out.println("Tipo de orden: " + ordenDestinario[0]);
+                        System.out.println("Nuevo servidor detectado: "
                                           + ordenDestinario[1]);
-                      agregarOtrosServEnServicio(ordenDestinario[1]);
-                      //Luego enviar acuse de recibo
-                      break;
+                        agregarOtrosServEnServicio(ordenDestinario[1]);
+                        //Luego enviar acuse de recibo
+                        break;
+                    case "BUSCAR":
+                        System.out.println("Buscar Host");
+
+                        buzonEstandar = new byte[256]; // Resetear buffer entrada
+                        paqueteEntrante =
+                            new DatagramPacket(buzonEstandar, buzonEstandar.length);
+                        socketEscucha.receive(paqueteEntrante);
+                        mensaje = new String(buzonEstandar, 0,
+                                         buzonEstandar.length);
+                        mensaje = mensaje.trim();
+
+                        System.out.println("Nombre proyecto: " + mensaje);
+                        nombreProyecto = mensaje;
+                      
+                        Coleccion existe = existeRepo(nombreProyecto);
+                      
+                        String orden;
+                      
+                        if (existe != null)
+                            orden = "EXISTE";
+                        else
+                            orden = "NEXISTE";
+                      
+                        DatagramPacket existePaquete = 
+                              new DatagramPacket(orden.getBytes(),
+                                                 orden.length(),
+                                                 direccionIPMulticast,puerto);
+                      
+                        socketEscucha.send(existePaquete);
+                        
+                        if (existe != null) {
+                            
+                            ByteArrayOutputStream bs = new ByteArrayOutputStream();
+                            ObjectOutputStream os = new ObjectOutputStream (bs);
+                            os.writeObject(existe);
+                            os.close();
+                            byte[] archivos =  bs.toByteArray();
+                            DatagramPacket repo = new DatagramPacket(
+                                                      archivos,archivos.length,
+                                                      direccionIPMulticast, puerto);
+                           
+                            int num =  archivos.length;
+                            byte[] longitud = Integer.toString(num).getBytes();
+                            DatagramPacket longitudArchivos = new DatagramPacket(
+                                                                  longitud, longitud.length,
+                                                                  direccionIPMulticast, puerto);
+
+                            socketEscucha.send(longitudArchivos);
+                            socketEscucha.send(repo);
+                        }
+                      
+                        break;
+                      
+                    case "EXISTE":
+                        System.out.println("Ignorar mensaje EXISTE.");
+                        break;
+                    case "NEXISTE":
+                        System.out.println("Ignorar mensaje NO EXISTE");
+                        break;
+                      
                 }
             }
 

@@ -40,15 +40,16 @@ public class ServPrincipal extends ServAlmacenamiento {
 
     public static void main(String args[]) {
 
-        if (args.length < 3) {
+        if (args.length < 4) {
             System.err.println("Parametros incorrectos. java ServPrincipal"
-                + "<puertoServicio> <puertoControl> <direccionMulticast> <NroReplicas>");
+                + "<puertoServicio> <puertoControl> <direccionMulticast> <NroReplicas> <nroServidoresAlm>");
             System.exit(1);
         }
 
         int puertoServicio = Integer.parseInt(args[0]);
         int puertoControl = Integer.parseInt(args[1]);
         int nroReplicas = Integer.parseInt(args[3]);
+        int nroServidores = Integer.parseInt(args[4]);
 
         try {
             LocateRegistry.createRegistry(puertoServicio);
@@ -58,7 +59,7 @@ public class ServPrincipal extends ServAlmacenamiento {
         }
 
         OpServidorServidor operacionesInternas =
-            new OpServidorServidor(puertoControl, args[2], nroReplicas);
+            new OpServidorServidor(puertoControl, args[2], nroReplicas, nroServidores);
 
         operacionesInternas.start();
         new ServPrincipal(puertoServicio, puertoControl,

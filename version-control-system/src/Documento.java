@@ -3,11 +3,13 @@
     Representa un archivo almacenado en bytes.
 */
 import java.io.*;
+import java.util.Date;
 public class Documento implements Serializable {
 
     private byte[] contenido;
     private String camino;
     private String nombre;
+    private Date fecha;
     // Atributos utiles para el documento
 
     public Documento(String camino) {
@@ -21,8 +23,7 @@ public class Documento implements Serializable {
             entrada.close();
             contenido = temp;
         } catch(Exception e) {
-            System.out.println("Documento: "+e.getMessage());
-            e.printStackTrace();
+            System.out.println("El archivo dado no existe.");
         }
 
         this.camino = camino;
@@ -47,6 +48,10 @@ public class Documento implements Serializable {
          salida.close();
          return temp;
     }*/
+    
+    public Date obtFecha() {
+        return fecha;
+    }
 
     public byte[] obtContenidoByte() {
         return contenido;

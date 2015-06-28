@@ -6,6 +6,13 @@ import java.net.MulticastSocket;
 import java.net.UnknownHostException;
 import java.util.*;
 import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /*
     Lista de aspectos por implementar
@@ -20,13 +27,15 @@ public class OpServidorServidor extends Thread {
     private MulticastSocket socket;
     private int puerto;
     private int nroReplicas;
+    private int nroServidores = 0;
     //Posible problemas de concurrencia
     private HashMap<Integer,String> listaServAlmacen;
     private HashMap<String,Integer> cargaServAlmacen;
 
-    OpServidorServidor(int puerto, String direccionIpMulticast, int nroReplicas) {
+    OpServidorServidor(int puerto, String direccionIpMulticast, int nroReplicas, int nroServidores) {
         try {
             this.nroReplicas = nroReplicas;
+            this.nroServidores = nroServidores;
             this.puerto = puerto;
             this.direccionIpMulticast =
                 InetAddress.getByName(direccionIpMulticast);
@@ -161,6 +170,79 @@ public class OpServidorServidor extends Thread {
         }
         return salida;
     }*/
+    
+    public Coleccion buscarRepo(String nombreRepo) {
+        
+        try {
+            String ordenAEnviar = "BUSCAR ";
+            DatagramPacket orden = new DatagramPacket(
+                                       ordenAEnviar.getBytes(),
+                                       ordenAEnviar.length(),
+                                       direccionIpMulticast,
+                                       puerto);
+            
+            socket.send(orden);
+            
+            DatagramPacket nombreDirectorio = new DatagramPacket(
+                                                  nombreRepo.getBytes(),
+                                                  nombreRepo.length(),
+                                                  direccionIpMulticast,
+                                                  puerto);
+            
+            socket.send(nombreDirectorio);
+            
+            byte[] buf = new byte[256];
+            DatagramPacket recv = new DatagramPacket(buf,buf.length,
+                                                     direccionIpMulticast,
+                                                     puerto);
+            
+            System.out.println("Esperando respuesta...");
+
+            while (true) {
+                socket.receive(recv);
+
+                String mensaje = new String(buf,0,buf.length);
+                mensaje = mensaje.trim();
+
+                System.out.println("Mensaje: " + mensaje);
+
+                switch (mensaje) {
+                    case "EXISTE":
+
+                        buf = new byte[256];
+                        byte[] buffer = new byte[256];
+                        DatagramPacket paqueteEntrante = new DatagramPacket(
+                                                             buffer,buffer.length);
+                        socket.receive(paqueteEntrante);
+                        String msj = new String(buffer, 0,buffer.length);
+                        msj = msj.trim();
+                        System.out.println("Longitud de paquete de documentos: "
+                                            + msj + " bytes");
+                        byte[] paquete = new byte[Integer.parseInt(msj)];
+                        paqueteEntrante = new DatagramPacket(paquete, paquete.length);
+
+                        socket.receive(paqueteEntrante);
+                        ByteArrayInputStream bs = new ByteArrayInputStream(paquete);
+                        ObjectInputStream is = new ObjectInputStream(bs);
+                        Coleccion archivos = (Coleccion) is.readObject();
+                        is.close();
+
+                        return archivos;
+                    case "NEXISTE":
+                        return null;
+                    default:
+                        break;
+                }
+            }
+        } catch (IOException ex) {
+            Logger.getLogger(OpServidorServidor.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ClassNotFoundException ex) {
+            Logger.getLogger(OpServidorServidor.class.getName()).log(Level.SEVERE, null, ex);
+        }
+        return null;
+
+        
+    }
 
     public void agregarServAlmacen() {
         byte[] buzonEstandar = new byte[256];
@@ -168,13 +250,14 @@ public class OpServidorServidor extends Thread {
         String mensaje, temporal;
         String[] ordenDestinatario;
         int tamanioLista;
+        int servAlm = 0;
 
         if ((listaServAlmacen == null) && (cargaServAlmacen == null)) {
             listaServAlmacen = new HashMap<Integer,String>();
             cargaServAlmacen = new HashMap<String,Integer>();
         }
 
-        while (true) {
+        while (servAlm < nroServidores) {
             DatagramPacket paqueteEntrante = new
                 DatagramPacket(buzonEstandar,buzonEstandar.length);
             try {
@@ -195,6 +278,7 @@ public class OpServidorServidor extends Thread {
                 System.out.println("ServPrincipal :" + e.getMessage());
                 e.printStackTrace();
             }
+            servAlm++;
         }
     }
 
