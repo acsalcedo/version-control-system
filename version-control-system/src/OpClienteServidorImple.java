@@ -1,7 +1,6 @@
 
 import java.util.*;
 import java.io.*;
-import java.net.InetAddress;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -83,39 +82,6 @@ public class OpClienteServidorImple
 
     }
 
-<<<<<<< HEAD
-    public String checkout(String nombreRepo) throws java.rmi.RemoteException {
-
-        
-        return operacionesInternas.buscarHost(nombreRepo);
-        
-         
-//        Path path = Paths.get(nombreRepo);
-//
-//        if (!Files.exists(path)) {
-//            System.out.println("El repositorio " + nombreRepo + " no existe.");
-//            return null;
-//        } else {
-//
-//            Coleccion docs = new Coleccion(nombreRepo);
-//            File carpeta = new File(nombreRepo);
-//            File[] archivos = carpeta.listFiles();
-//
-//            for (int i = 0; i < archivos.length; i++) {
-//                if (archivos[i].isFile()) {
-//                    String nombreArchivo = archivos[i].getName();
-//                    System.out.println(nombreArchivo);
-//                    docs.agregarDocumento(path.toString()+'/'+nombreArchivo);
-//                }
-//            }
-//            return docs;
-//        }
-       // return null;
-    }
-
-    public void listarArchivos() throws java.rmi.RemoteException {
-
-=======
     public Coleccion checkout(String nombreRepo)  throws java.rmi.RemoteException {
 
         return operacionesInternas.buscarRepo(nombreRepo);
@@ -142,7 +108,6 @@ public class OpClienteServidorImple
             listaArch += "\n";  
             return listaArch;
         }
->>>>>>> multicast
     }
 
     /*

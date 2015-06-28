@@ -11,13 +11,9 @@ import java.net.MulticastSocket;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.net.UnknownHostException;
-<<<<<<< HEAD
-import java.nio.file.*;
-=======
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
->>>>>>> multicast
 import java.util.*;
 
 public class ServAlmacenamiento extends Thread {
@@ -30,28 +26,12 @@ public class ServAlmacenamiento extends Thread {
     static int puerto;
     static int puertoCliente = 8600;
 
-<<<<<<< HEAD
-    public static boolean existeRepo(String nombreRepo) {
-        
-        Path path = Paths.get(nombreRepo);
-
-        if (!Files.exists(path)) {
-            System.out.println("El repositorio " + nombreRepo + " no existe.");
-            return false;
-        }
-        return true;
-    }
-    public static boolean construirReplica(Coleccion archivos_recibidos) {
-        String nomDirectorio = "repositorios";
-=======
     public static boolean construirReplica(
         ArrayList<Documento> archivos_recibidos, String nomDirectorio) {
         //String nomDirectorio = "pruebasAlmacenamiento";
->>>>>>> multicast
         byte[] buffer;
 
         if (archivos_recibidos != null) {
-            nomDirectorio += "/" + archivos_recibidos.obtNombreProyecto();
             File directorio = new File(nomDirectorio);
             if (!directorio.exists()) {
                 if (directorio.mkdir()) {
@@ -67,7 +47,7 @@ public class ServAlmacenamiento extends Thread {
            try {
                 // Agrega los archivos contenidos en la coleccion
                 // Escribe los documentos en el sistema de archivos del servidor
-                for ( Documento doc : archivos_recibidos.obtDocumentos() ) {
+                for ( Documento doc : archivos_recibidos ) {
                     System.out.println(nomDirectorio+'/'+doc.obtNombre());
                     File nuevo = new File(nomDirectorio+'/'+doc.obtNombre());
 
@@ -146,11 +126,6 @@ public class ServAlmacenamiento extends Thread {
             System.exit(1);
         }
 
-<<<<<<< HEAD
-        System.out.println("Nro Puerto: " +args[0]);
-        int puerto = Integer.parseInt(args[0]);
-        byte[] tamanoPaqueteEntrante = new byte[1000];
-=======
         System.out.println("Nro Puerto en escucha: " + args[1]);
         puerto = Integer.parseInt(args[1]);
         nombreServidor = args[0];
@@ -158,7 +133,6 @@ public class ServAlmacenamiento extends Thread {
         byte[] copiaBuzon = new byte[256];
         String mensaje, nombreProyecto, temporal;
         String[] ordenDestinario;
->>>>>>> multicast
 
 //        Thread t1 = new Thread(){
 //            
@@ -197,62 +171,6 @@ public class ServAlmacenamiento extends Thread {
 
 
             while (true) {
-<<<<<<< HEAD
-                socketEscucha.receive(paqueteEntrante);
-                System.out.println("Recibiendo mensajes");
-                String temp = new String(tamanoPaqueteEntrante, 0,
-                                         tamanoPaqueteEntrante.length);
-                //System.out.println("Longitud de mensaje: " +temp.trim());
-                //System.out.printf("Longitud de mensaje (entero): %d\n", Integer.parseInt(temp.trim() ) );
-                byte[] paquete = new byte[Integer.parseInt(temp.trim())];
-                paqueteEntrante = new DatagramPacket(paquete, paquete.length);
-                socketEscucha.receive(paqueteEntrante);
-
-                // Convertir
-                ByteArrayInputStream bs= new ByteArrayInputStream(paquete); // bytes es el byte[]
-                ObjectInputStream is = new ObjectInputStream(bs);
-                Object o = is.readObject();
-                
-                System.out.println(o.getClass().toString());
-                                
-                if (o.getClass() == String.class) {
-                    
-                    String nombreRepo = (String) o;
-                    System.out.println(nombreRepo);
-                    
-                    boolean existe = existeRepo(nombreRepo);
-                        
-                    ByteArrayOutputStream bs2 = new ByteArrayOutputStream();
-                    ObjectOutputStream os = new ObjectOutputStream (bs2);
-                    os.writeObject(existe); 
-                    os.close();
-                    byte[] msg =  bs2.toByteArray();
-
-                    int num =  msg.length;
-
-                    byte[] longitud = Integer.toString(num).getBytes();
-                    DatagramPacket longitudEnvio = new DatagramPacket(longitud, longitud.length,
-                                    direccionIPMulticast, puerto);
-                    DatagramPacket existePaquete = new DatagramPacket(msg,msg.length,
-                                                direccionIPMulticast, puerto);
-                    
-                    socketEscucha.send(longitudEnvio);
-                    socketEscucha.send(existePaquete);
-
-
-                    System.out.println("existe: " + existe);
-                    
- 
-                } else if (o.getClass() == Coleccion.class){
-                    Coleccion archivos = (Coleccion) o;
-                    construirReplica(archivos);
-
-                } else {
-                    System.out.println("Ignorar");
-                }
-                
-                is.close();
-=======
               // Recibe un primer paquete del tamaño completo de todos los
               // documentos.
               socketEscucha.receive(paqueteEntrante);
@@ -377,7 +295,6 @@ public class ServAlmacenamiento extends Thread {
                         break;
                       
                 }
->>>>>>> multicast
             }
 
         } catch(Exception e) {

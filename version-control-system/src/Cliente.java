@@ -128,20 +128,6 @@ public class Cliente {
         String workingDirectory = System.getProperty("user.dir");
         String repository = null;
 
-<<<<<<< HEAD
-            String workingDirectory = System.getProperty("user.dir");
-            String repository = "prueba1";
-
-            // Hacer commit
-            cli.agregarDirectorioProtegido("prueba1");
-            cli.agregarArchivo(workingDirectory +"/prueba1/archivo1.txt");
-            cli.agregarArchivo(workingDirectory +"/prueba1/archivo2.txt");
-            operaciones.commit(cli.obtArchivosProtegidos());
-
-            System.out.println(operaciones.checkout(repository));
-
-            //crearRepositorio(docs);
-=======
         // Variable que determina la operacion remota a realizar
         int estado = 0;
 
@@ -180,7 +166,6 @@ public class Cliente {
             Scanner indata  = new Scanner(System.in);
             System.out.println("");
             System.out.print(" \t\tOpción: ");
->>>>>>> multicast
 
             try {
                 estado = entrada.nextInt();
